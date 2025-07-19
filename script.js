@@ -1,5 +1,5 @@
 // === Setup PDF.js ===
-const pdfBaseUrl = 'asset/publication.pdf';
+const pdfBaseUrl = 'lib/publication.pdf';
 let pdfDoc = null;
 
 const listView = document.getElementById('listView');
@@ -14,7 +14,7 @@ const toc = [
     title: "Bab 1 Syarat dan Ketentuan Umum",
     page: 10,
     sub: [
-      { title: "A. Umum",       page: 10 },
+      { title: "A. Umum",       pages: 10 },
       { title: "B. Klausul Pemesanan", page: 10 },
       { title: "C. Ruang Lingkup dan Kinerja", page: 11 },
       /* dst… */
