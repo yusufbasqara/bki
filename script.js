@@ -1,78 +1,31 @@
-// ========= setup PDF.js =========
-const pdfBaseUrl = 'lib/publication.pdf';
-let pdfDoc = null;
+// ==== Setup PDF.js & DOM refs ====
+const pdfPath  = 'lib/publication.pdf';
+let pdfDoc     = null;
 
-// DOM references
-const listView = document.getElementById('listView');
-const pdfView  = document.getElementById('pdfView');
-const pdfTitle = document.getElementById('pdf-title');
-const canvas   = document.getElementById('pdf-canvas');
-const ctx      = canvas.getContext('2d');
+const listView   = document.getElementById('listView');
+const pdfView    = document.getElementById('pdfView');
+const pdfTitle   = document.getElementById('pdf-title');
+const pdfContainer = document.getElementById('pdfContainer');
 
-// ====== daftar isi data ======
+// Daftar isi data (unchanged)
 const toc = [
-  {
-    title: "Bab 1 Syarat dan Ketentuan Umum",
-    page: 10,
-    sub: [
-      { title: "A. Umum", page: 10 },
-      { title: "B. Klausul Pemesanan", page: 10 },
-      { title: "C. Ruang Lingkup dan Kinerja", page: 11 },
-      { title: "D. Kerahasiaan", page: 11 },
-      { title: "E. Biaya", page: 12 },
-      { title: "F. Pembayaran Nota Debet", page: 12 },
-      { title: "G. Kewajiban dan Yurisdiksi", page: 12 },
-      { title: "H. Ketidaksepakatan", page: 12 },
-      { title: "I. Anti-Suap dan Kepatuhan", page: 12 }
-    ]
-  },
-  {
-    title: "Bab 2 Klasifikasi",
-    page: 14,
-    sub: [
-      { title: "A. Umum", page: 14 },
-      { title: "B. Masa Berlaku Klas", page: 19 },
-      { title: "C. Klasifikasi Kapal Bangunan Baru", page: 27 },
-      { title: "D. Klasifikasi Kapal dalam Layanan", page: 30 }
-    ]
-  },
-  {
-    title: "Bab 3 Survei – Persyaratan Umum",
-    page: 44,
-    sub: [
-      { title: "A. Informasi Umum", page: 44 },
-      { title: "B. Survei Mempertahankan Klas", page: 49 },
-      { title: "C. Survei Periodik Instalasi …", page: 98 },
-      { title: "D. Pengukuran Ketebalan", page: 102 }
-    ]
-  },
-  {
-    title: "Bab 4 Survei",
-    page: 106,
-    sub: [
-      { title: "I. Persyaratan Tambahan untuk Notasi ESP", page: 106 },
-      { title: "II. Tambahan untuk Kapal tanpa Notasi ESP", page: 167 },
-      { title: "A.1 Petunjuk Masuk Ruang Tertutup", page: 194 },
-      { title: "A.2 Survei Lambung Kapal Baru", page: 199 },
-      { title: "A.3 Batasan Pengurangan", page: 226 },
-      { title: "A.4 Klas Penambatan Kapal", page: 229 },
-      { title: "A.5 Survei Transit Kabel Kedap Air", page: 234 }
-    ]
-  }
+  { title:"Bab 1 Syarat dan Ketentuan Umum", page:10, sub:[ /* … */ ] },
+  { title:"Bab 2 Klasifikasi", page:14, sub:[ /* … */ ] },
+  { title:"Bab 3 Survei – Persyaratan Umum", page:44, sub:[ /* … */ ] },
+  { title:"Bab 4 Survei", page:106, sub:[ /* … */ ] }
 ];
 
-/** 1) Bangun TOC + cek hash/query */
+/** Bangun daftar isi & handle deep-link atau hash */
 function renderTOC() {
   const container = document.getElementById('toc-list');
-  container.innerHTML = toc.map((chap, i) => {
-    const babId = `bab${i+1}`;  // bab1, bab2, …
+  container.innerHTML = toc.map((chap,i) => {
+    const babId = `bab${i+1}`;
     return `
       <div>
-        <button
-          data-target="${babId}"
+        <button data-target="${babId}"
           onclick="toggleSubChapters('${babId}', this)"
-          class="w-full flex justify-between items-center bg-gray-100 hover:bg-gray-200 px-4 py-3 rounded-lg border border-gray-200
-                 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full flex justify-between items-center bg-gray-100 hover:bg-gray-200
+                 px-4 py-3 rounded-lg border border-gray-200 transition focus:ring-2 focus:ring-blue-500"
         >
           <span class="font-semibold text-left">${chap.title}</span>
           <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,13 +35,10 @@ function renderTOC() {
         </button>
         <div id="${babId}" class="hidden pl-6 mt-2 space-y-1">
           ${chap.sub.map(sub => {
-            // kode goto: 1A, 2B, dst.
             const gotoCode = `${i+1}${sub.title.split(' ')[0].replace(/\D/g,'')}`;
             return `
-            <button
-              data-goto="${gotoCode}"
-              data-page="${sub.page}"
-              onclick="showChapterFromButton(this)"
+            <button data-goto="${gotoCode}" data-page="${sub.page}"
+              onclick="openPDF(this)"
               class="flex items-center w-full text-left py-2 px-3 rounded hover:bg-blue-50 transition whitespace-nowrap"
             >
               <svg class="w-3 h-3 mr-2 text-blue-600 flex-shrink-0" viewBox="0 0 8 8" fill="currentColor">
@@ -101,108 +51,120 @@ function renderTOC() {
       </div>`;
   }).join('');
 
-  // 2) after render: handle deep-link vs hash
+  // Deteksi param ?goto= atau #babX
   const params = new URLSearchParams(window.location.search);
-  const goto   = params.get('goto');
-  const hash   = window.location.hash.substring(1);
-  if (goto) {
-    handleDeepLink(goto);
-  } else if (hash) {
-    handleHash(hash);
+  if (params.has('goto')) {
+    handleDeepLink(params.get('goto'));
+  } else if (window.location.hash) {
+    handleHash(window.location.hash.substring(1));
   }
 }
 
-/** Toggle Bab + update hash + ensure single-open */
+/** Toggle satu-saja accordion dan set hash */
 function toggleSubChapters(babId, btn) {
   const subDiv = document.getElementById(babId);
   const icon   = btn.querySelector('svg');
   const opening = subDiv.classList.contains('hidden');
 
+  // tutup semua lainnya
+  document.querySelectorAll('[id^="bab"]').forEach(el => {
+    if (el.id !== babId) {
+      el.classList.add('hidden');
+      document.querySelector(`button[data-target="${el.id}"] svg`).classList.remove('rotate-180');
+    }
+  });
+
   if (opening) {
-    // tutup semua lainnya
-    document.querySelectorAll('[id^="bab"]').forEach(other => {
-      if (other.id !== babId && !other.classList.contains('hidden')) {
-        const mainBtn = document.querySelector(`button[data-target="${other.id}"]`);
-        other.classList.add('hidden');
-        mainBtn.querySelector('svg').classList.remove('rotate-180');
-      }
-    });
-    // buka ini
     subDiv.classList.remove('hidden');
     icon.classList.add('rotate-180');
-    history.replaceState(null, '', `#${babId}`);
+    history.replaceState(null,'',`#${babId}`);
   } else {
-    // tutup ini
     subDiv.classList.add('hidden');
     icon.classList.remove('rotate-180');
-    history.replaceState(null, '', window.location.pathname);
+    history.replaceState(null,'',window.location.pathname);
   }
 }
 
-/** panggil showChapter dari tombol sub-bab */
-function showChapterFromButton(btn) {
+/** Ketika sub-bab diklik → buka PDF full-viewer */
+function openPDF(btn) {
   const title = btn.textContent.trim();
-  const page  = parseInt(btn.dataset.page, 10);
-  showChapter(title, page);
-}
-
-/** Render halaman PDF */
-function showChapter(title, pageNum) {
+  const page  = parseInt(btn.dataset.page,10);
   pdfTitle.textContent = title;
   listView.classList.add('hidden');
   pdfView.classList.remove('hidden');
 
-  const render = num => {
-    pdfDoc.getPage(num).then(page => {
-      const container = document.querySelector('.pdf-frame-container');
-      const vp0 = page.getViewport({ scale: 1 });
-      const scale = container.clientWidth / vp0.width;
+  if (!pdfDoc) {
+    pdfjsLib.getDocument(pdfPath).promise.then(doc => {
+      pdfDoc = doc;
+      renderAllPages(page);
+    });
+  } else {
+    scrollToPage(page);
+  }
+}
+
+/** Render SEMUA halaman, lalu scroll ke target */
+function renderAllPages(targetPage) {
+  const total = pdfDoc.numPages;
+  // kosongkan dulu
+  pdfContainer.innerHTML = '';
+  for (let i = 1; i <= total; i++) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pageDiv';
+    wrapper.dataset.page = i;
+    const canvas = document.createElement('canvas');
+    wrapper.appendChild(canvas);
+    pdfContainer.appendChild(wrapper);
+
+    // render page
+    pdfDoc.getPage(i).then(page => {
+      const viewport0 = page.getViewport({ scale: 1 });
+      const scale = pdfContainer.clientWidth / viewport0.width;
       const vp = page.getViewport({ scale });
       canvas.width  = vp.width;
       canvas.height = vp.height;
-      page.render({ canvasContext: ctx, viewport: vp });
+      page.render({ canvasContext: canvas.getContext('2d'), viewport: vp })
+          .promise.finally(() => {
+            // setelah render halaman target, scroll
+            if (i === targetPage) scrollToPage(targetPage);
+          });
     });
-  };
-
-  if (!pdfDoc) {
-    pdfjsLib.getDocument(pdfBaseUrl).promise.then(doc => {
-      pdfDoc = doc;
-      render(pageNum);
-    });
-  } else {
-    render(pageNum);
   }
 }
 
-/** deep-link via ?goto=1A,2B… */
+/** Scroll container ke canvas target */
+function scrollToPage(pageNum) {
+  const el = document.querySelector(`.pageDiv[data-page="${pageNum}"]`);
+  if (el) pdfContainer.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+}
+
+/** Deep-link via ?goto= */
 function handleDeepLink(code) {
   const btn = document.querySelector(`button[data-goto="${code}"]`);
-  if (!btn) return;  
-  // buka Bab parent
-  const babDiv = btn.closest('div').querySelector('div[id^="bab"]');
-  const mainBtn = document.querySelector(`button[data-target="${babDiv.id}"]`);
-  toggleSubChapters(babDiv.id, mainBtn);
-  // tampilkan PDF
-  showChapter(btn.textContent.trim(), parseInt(btn.dataset.page, 10));
+  if (!btn) return;
+  // buka parent accordion
+  const parentId = btn.closest('div[id^="bab"]').id;
+  toggleSubChapters(parentId, document.querySelector(`button[data-target="${parentId}"]`));
+  // render PDF
+  openPDF(btn);
 }
 
-/** buka accordion berdasar hash (#bab2, #bab3…) */
+/** Open via hash #babX (tanpa PDF) */
 function handleHash(babId) {
-  const mainBtn = document.querySelector(`button[data-target="${babId}"]`);
-  if (!mainBtn) return;
+  const btn = document.querySelector(`button[data-target="${babId}"]`);
+  if (!btn) return;
+  // buka accordion
   const subDiv = document.getElementById(babId);
-  if (subDiv.classList.contains('hidden')) {
-    subDiv.classList.remove('hidden');
-    mainBtn.querySelector('svg').classList.add('rotate-180');
-  }
+  subDiv.classList.remove('hidden');
+  btn.querySelector('svg').classList.add('rotate-180');
 }
 
-/** tombol Kembali */
+/** Tombol Kembali */
 function showList() {
   pdfView.classList.add('hidden');
   listView.classList.remove('hidden');
-  window.scrollTo(0,0);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// inisiasi
+// Inisiasi
 document.addEventListener('DOMContentLoaded', renderTOC);

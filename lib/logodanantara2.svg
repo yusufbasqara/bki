@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_2"
+   data-name="Layer 2"
+   viewBox="0 0 211.49001 238.86"
+   version="1.1"
+   sodipodi:docname="DanantaraIndonesiaLogo.svg"
+   width="211.49001"
+   height="238.86"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview392"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.1486984"
+     inkscape:cx="65.726568"
+     inkscape:cy="127.10038"
+     inkscape:window-width="1366"
+     inkscape:window-height="683"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g388" />
+  <defs
+     id="defs306">
+    <style
+       id="style304">
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: red;
+      }
+    </style>
+  </defs>
+  <g
+     id="Layer_1-2"
+     data-name="Layer 1">
+    <g
+       id="g388">
+      <g
+         id="g316"
+         transform="translate(0,-8.92)">
+        <path
+           d="m 211.49,119.02 v 18.66 c 0,60.81 -49.29,110.1 -110.1,110.1 H 0 V 8.92 h 101.39 c 60.81,0 110.1,49.29 110.1,110.1 z"
+           id="path308" />
+        <g
+           id="g314">
+          <path
+             class="cls-1"
+             d="m 185.84,144.62 c -6.06,-8.42 -18.18,-7.41 -18.18,-7.41 -48.17,0 -65.35,50.19 -65.35,50.19 l -41.59,-36.75 0.23,-0.34 c 0.24,-0.35 24.54,-35.36 95.25,-35.36 7.03,0 13.89,0.72 20.56,2.02 3.05,0.6 5.98,1.8 8.41,3.74 11.63,9.26 0.67,23.91 0.67,23.91 z"
+             id="path310" />
+          <path
+             class="cls-2"
+             d="m 173.26,110.28 c -5.55,-0.86 -11.25,-1.33 -17.06,-1.33 -71.28,0 -97.19,33.69 -100.01,37.7 L 12.72,108.24 c 0,0 42.44,-24.92 106.1,-24.92 37.2,0 50.13,14.72 54.44,26.96 z"
+             id="path312" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

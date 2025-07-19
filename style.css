@@ -6,19 +6,25 @@ body {
   scroll-behavior: smooth;
 }
 
-/* PDF container full-height minus header/footer (~6rem each) */
-.pdf-frame-container {
-  position: relative;
+/* PDF container: scrollable full-height minus header/footer (~12rem) */
+.pdfContainer {
   width: 100%;
   height: calc(100vh - 12rem);
   overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  align-items: start;
+  scroll-behavior: smooth;
+  padding-right: 0.5rem; /* space for scrollbar */
 }
 
-.pdf-frame-container canvas {
-  display: block;
+/* Style tiap halaman */
+.pdfContainer .pageDiv {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.pdfContainer .pageDiv canvas {
   max-width: 100%;
   height: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 0.375rem;
 }
