@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Peraturan Klasifikasi dan Survei</title>
 
@@ -10,16 +10,12 @@
   <script>
     tailwind.config = {
       theme: {
-        extend: {
-          fontFamily: { sans: ['Inter','sans-serif'] }
-        }
+        extend: { fontFamily: { sans: ['Inter','sans-serif'] }}
       }
     }
   </script>
 
-  <!-- Custom styles -->
-  <link rel="stylesheet" href="style.css" />
-  <!-- Inter font -->
+  <link rel="stylesheet" href="style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
@@ -34,7 +30,7 @@
       </div>
       <div class="px-6 py-8">
         <div id="toc-list" class="space-y-4">
-          <!-- Dihasilkan oleh script.js -->
+          <!-- WILL BE RENDERED BY script.js -->
         </div>
       </div>
     </div>
@@ -67,6 +63,7 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
   </script>
+  <!-- our script -->
   <script src="script.js"></script>
 </body>
 </html>

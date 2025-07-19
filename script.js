@@ -1,15 +1,15 @@
-// === Setup PDF.js ===
-const pdfBaseUrl = 'lib/publication.pdf';
+// ========= setup PDF.js =========
+const pdfBaseUrl = 'asset/publication.pdf';
 let pdfDoc = null;
 
-// DOM elements
+// DOM references
 const listView = document.getElementById('listView');
 const pdfView  = document.getElementById('pdfView');
 const pdfTitle = document.getElementById('pdf-title');
 const canvas   = document.getElementById('pdf-canvas');
 const ctx      = canvas.getContext('2d');
 
-// === Full TOC ===
+// ====== daftar isi data ======
 const toc = [
   {
     title: "Bab 1 Syarat dan Ketentuan Umum",
@@ -56,33 +56,23 @@ const toc = [
       { title: "A.2 Survei Lambung Kapal Baru", page: 199 },
       { title: "A.3 Batasan Pengurangan", page: 226 },
       { title: "A.4 Klas Penambatan Kapal", page: 229 },
-      { title: "A.5 Survei Transit Kabel Kedap Air", page: 234 },
-      { title: "B. Persyaratan Tambahan Notasi…", page: 240 },
-      { title: "C. Survei Gas dan Bahan Bakar", page: 250 },
-      { title: "D. Survei …", page: 260 },
-      { title: "E. …", page: 270 },
-      { title: "F. …", page: 280 },
-      { title: "G. …", page: 286 },
-      { title: "H. …", page: 290 },
-      { title: "B.8 Persyaratan Survei Tahunan…", page: 293 },
-      { title: "B.9 Kekuatan Pengamanan Penutup Palka", page: 294 },
-      { title: "B.10 Kekuatan Memanjang Penumpu Lambung", page: 294 },
-      { title: "B.11 Kriteria Pembaruan untuk Gading…", page: 297 }
+      { title: "A.5 Survei Transit Kabel Kedap Air", page: 234 }
     ]
   }
 ];
 
-/** Bangun daftar isi dan jalankan deep-link handler */
+/** 1) Bangun TOC + cek hash/query */
 function renderTOC() {
   const container = document.getElementById('toc-list');
   container.innerHTML = toc.map((chap, i) => {
-    const subId = `sub-${i}`;
+    const babId = `bab${i+1}`;  // bab1, bab2, …
     return `
       <div>
         <button
-          data-target="${subId}"
-          onclick="toggleSubChapters('${subId}', this)"
-          class="w-full flex justify-between items-center bg-gray-100 hover:bg-gray-200 px-4 py-3 rounded-lg border border-gray-200 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+          data-target="${babId}"
+          onclick="toggleSubChapters('${babId}', this)"
+          class="w-full flex justify-between items-center bg-gray-100 hover:bg-gray-200 px-4 py-3 rounded-lg border border-gray-200
+                 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <span class="font-semibold text-left">${chap.title}</span>
           <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,15 +80,15 @@ function renderTOC() {
                   d="M19 9l-7 7-7-7"/>
           </svg>
         </button>
-        <div id="${subId}" class="hidden pl-6 mt-2 space-y-1">
+        <div id="${babId}" class="hidden pl-6 mt-2 space-y-1">
           ${chap.sub.map(sub => {
-            // kode seperti "1A", "2B", dst
-            const code = `${i+1}${sub.title.split(' ')[0].replace(/\D/g,'')}`;
+            // kode goto: 1A, 2B, dst.
+            const gotoCode = `${i+1}${sub.title.split(' ')[0].replace(/\D/g,'')}`;
             return `
             <button
-              data-goto="${code}"
+              data-goto="${gotoCode}"
               data-page="${sub.page}"
-              onclick="showChapter('${sub.title}', ${sub.page})"
+              onclick="showChapterFromButton(this)"
               class="flex items-center w-full text-left py-2 px-3 rounded hover:bg-blue-50 transition whitespace-nowrap"
             >
               <svg class="w-3 h-3 mr-2 text-blue-600 flex-shrink-0" viewBox="0 0 8 8" fill="currentColor">
@@ -111,27 +101,58 @@ function renderTOC() {
       </div>`;
   }).join('');
 
-  // Jika ada param goto, jalankan deep-link
+  // 2) after render: handle deep-link vs hash
   const params = new URLSearchParams(window.location.search);
-  const goto  = params.get('goto');
-  if (goto) handleDeepLink(goto);
+  const goto   = params.get('goto');
+  const hash   = window.location.hash.substring(1);
+  if (goto) {
+    handleDeepLink(goto);
+  } else if (hash) {
+    handleHash(hash);
+  }
 }
 
-/** Toggle accordion */
-function toggleSubChapters(id, btn) {
-  const sub = document.getElementById(id);
-  const icon = btn.querySelector('svg');
-  sub.classList.toggle('hidden');
-  icon.classList.toggle('rotate-180');
+/** Toggle Bab + update hash + ensure single-open */
+function toggleSubChapters(babId, btn) {
+  const subDiv = document.getElementById(babId);
+  const icon   = btn.querySelector('svg');
+  const opening = subDiv.classList.contains('hidden');
+
+  if (opening) {
+    // tutup semua lainnya
+    document.querySelectorAll('[id^="bab"]').forEach(other => {
+      if (other.id !== babId && !other.classList.contains('hidden')) {
+        const mainBtn = document.querySelector(`button[data-target="${other.id}"]`);
+        other.classList.add('hidden');
+        mainBtn.querySelector('svg').classList.remove('rotate-180');
+      }
+    });
+    // buka ini
+    subDiv.classList.remove('hidden');
+    icon.classList.add('rotate-180');
+    history.replaceState(null, '', `#${babId}`);
+  } else {
+    // tutup ini
+    subDiv.classList.add('hidden');
+    icon.classList.remove('rotate-180');
+    history.replaceState(null, '', window.location.pathname);
+  }
 }
 
-/** Tampilkan halaman via PDF.js */
+/** panggil showChapter dari tombol sub-bab */
+function showChapterFromButton(btn) {
+  const title = btn.textContent.trim();
+  const page  = parseInt(btn.dataset.page, 10);
+  showChapter(title, page);
+}
+
+/** Render halaman PDF */
 function showChapter(title, pageNum) {
   pdfTitle.textContent = title;
   listView.classList.add('hidden');
   pdfView.classList.remove('hidden');
 
-  const renderPage = num => {
+  const render = num => {
     pdfDoc.getPage(num).then(page => {
       const container = document.querySelector('.pdf-frame-container');
       const vp0 = page.getViewport({ scale: 1 });
@@ -146,37 +167,42 @@ function showChapter(title, pageNum) {
   if (!pdfDoc) {
     pdfjsLib.getDocument(pdfBaseUrl).promise.then(doc => {
       pdfDoc = doc;
-      renderPage(pageNum);
+      render(pageNum);
     });
   } else {
-    renderPage(pageNum);
+    render(pageNum);
   }
 }
 
-/** Kembali ke daftar isi */
+/** deep-link via ?goto=1A,2B… */
+function handleDeepLink(code) {
+  const btn = document.querySelector(`button[data-goto="${code}"]`);
+  if (!btn) return;  
+  // buka Bab parent
+  const babDiv = btn.closest('div').querySelector('div[id^="bab"]');
+  const mainBtn = document.querySelector(`button[data-target="${babDiv.id}"]`);
+  toggleSubChapters(babDiv.id, mainBtn);
+  // tampilkan PDF
+  showChapter(btn.textContent.trim(), parseInt(btn.dataset.page, 10));
+}
+
+/** buka accordion berdasar hash (#bab2, #bab3…) */
+function handleHash(babId) {
+  const mainBtn = document.querySelector(`button[data-target="${babId}"]`);
+  if (!mainBtn) return;
+  const subDiv = document.getElementById(babId);
+  if (subDiv.classList.contains('hidden')) {
+    subDiv.classList.remove('hidden');
+    mainBtn.querySelector('svg').classList.add('rotate-180');
+  }
+}
+
+/** tombol Kembali */
 function showList() {
   pdfView.classList.add('hidden');
   listView.classList.remove('hidden');
-  // scroll ke atas utk UX
   window.scrollTo(0,0);
 }
 
-/** Deep-link: buka accordion & panggil showChapter */
-function handleDeepLink(code) {
-  const subBtn = document.querySelector(`button[data-goto="${code}"]`);
-  if (!subBtn) return;       // invalid code → tetap listView
-
-  // buka accordion parent
-  const subContainer = subBtn.parentElement;
-  if (subContainer.classList.contains('hidden')) {
-    const mainBtn = document.querySelector(`button[data-target="${subContainer.id}"]`);
-    toggleSubChapters(subContainer.id, mainBtn);
-  }
-
-  // parse page + tampilkan
-  const page = parseInt(subBtn.dataset.page, 10);
-  showChapter(subBtn.textContent.trim(), page);
-}
-
-// Jalankan saat load
+// inisiasi
 document.addEventListener('DOMContentLoaded', renderTOC);
