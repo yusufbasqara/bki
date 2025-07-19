@@ -1,157 +1,73 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Bacaan Dokumen</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="style.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Peraturan Klasifikasi dan Survei</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="style.css" />
+  <!-- Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 font-sans text-gray-800">
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+  <div class="max-w-4xl mx-auto p-4 lg:p-8">
 
-        <div id="listView" class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="p-6 sm:p-8 border-b border-gray-200">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Peraturan Klasifikasi dan Survei</h1>
-                <p class="mt-2 text-gray-600">Silakan pilih bab yang ingin Anda baca dari daftar di bawah ini.</p>
-            </div>
-
-            <div class="p-6 sm:p-8">
-                <div class="flex flex-col space-y-2">
-                    <h2 class="text-xl font-semibold text-gray-700 mb-3">Volume I: Daftar Isi</h2>
-                    
-                    <div>
-                        <button onclick="toggleSubChapters('sub-bab-1', this)" class="w-full flex justify-between items-center text-left p-4 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <span class="font-bold text-lg text-gray-800">Bab 1: Syarat dan Ketentuan Umum</span>
-                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="sub-bab-1" class="hidden pl-4 pt-2 space-y-1">
-                            <button onclick="showChapter('A. Umum', 10)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A. Umum</button>
-                            <button onclick="showChapter('B. Klausul Pemesanan', 10)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B. Klausul Pemesanan</button>
-                            <button onclick="showChapter('C. Ruang Lingkup dan Kinerja', 11)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">C. Ruang Lingkup dan Kinerja</button>
-                            <button onclick="showChapter('D. Kerahasiaan', 11)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">D. Kerahasiaan</button>
-                            <button onclick="showChapter('E. Biaya', 12)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">E. Biaya</button>
-                            <button onclick="showChapter('F. Pembayaran Nota Debet', 12)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">F. Pembayaran Nota Debet</button>
-                            <button onclick="showChapter('G. Kewajiban dan Yurisdiksi', 12)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">G. Kewajiban dan Yurisdiksi</button>
-                            <button onclick="showChapter('H. Ketidaksepakatan', 12)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">H. Ketidaksepakatan</button>
-                            <button onclick="showChapter('I. Anti-Suap dan Kepatuhan', 12)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">I. Anti-Suap dan Kepatuhan</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <button onclick="toggleSubChapters('sub-bab-2', this)" class="w-full flex justify-between items-center text-left p-4 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <span class="font-bold text-lg text-gray-800">Bab 2: Klasifikasi</span>
-                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="sub-bab-2" class="hidden pl-4 pt-2 space-y-1">
-                            <button onclick="showChapter('A. Umum', 14)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A. Umum</button>
-                            <button onclick="showChapter('B. Masa Berlaku Klas', 19)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B. Masa Berlaku Klas</button>
-                            <button onclick="showChapter('C. Klasifikasi Kapal Bangunan Baru', 27)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">C. Klasifikasi Kapal Bangunan Baru</button>
-                            <button onclick="showChapter('D. Klasifikasi Kapal setelah Konstruksi', 30)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">D. Klasifikasi Kapal setelah Konstruksi</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <button onclick="toggleSubChapters('sub-bab-3', this)" class="w-full flex justify-between items-center text-left p-4 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <span class="font-bold text-lg text-gray-800">Bab 3: Survei - Persyaratan Umum</span>
-                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="sub-bab-3" class="hidden pl-4 pt-2 space-y-1">
-                            <button onclick="showChapter('A. Informasi Umum', 44)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A. Informasi Umum</button>
-                            <button onclick="showChapter('B. Survei Mempertahankan Klas', 49)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B. Survei Mempertahankan Klas</button>
-                            <button onclick="showChapter('C. Survei Periodik Instalasi Bahan Bakar...', 98)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">C. Survei Periodik Instalasi Bahan Bakar...</button>
-                            <button onclick="showChapter('D. Pengukuran Ketebalan', 102)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">D. Pengukuran Ketebalan</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <button onclick="toggleSubChapters('sub-bab-4', this)" class="w-full flex justify-between items-center text-left p-4 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <span class="font-bold text-lg text-gray-800">Bab 4: Survei</span>
-                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="sub-bab-4" class="hidden pl-4 pt-2 space-y-1">
-                            <button onclick="showChapter('I. A. Umum (ESP)', 106)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">I. A. Umum (ESP)</button>
-                            <button onclick="showChapter('I. B. Kapal Tangki Minyak', 116)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">I. B. Kapal Tangki Minyak</button>
-                            <button onclick="showChapter('I. C. Kapal Tangki Minyak Lambung Ganda', 122)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">I. C. Kapal Tangki Minyak Lambung Ganda</button>
-                            <button onclick="showChapter('I. D. Kapal Tangki Kimia', 131)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">I. D. Kapal Tangki Kimia</button>
-                            <button onclick="showChapter('I. E. Kapal Pengangkut Curah', 141)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">I. E. Kapal Pengangkut Curah</button>
-                            <button onclick="showChapter('I. F. Kapal Pengangkut Curah Kulit Ganda', 156)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">I. F. Kapal Pengangkut Curah Kulit Ganda</button>
-                            <button onclick="showChapter('II. A. Kapal Pengangkut Gas Cair', 167)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">II. A. Kapal Pengangkut Gas Cair</button>
-                            <button onclick="showChapter('II. B. Kapal Muatan Kering Umum', 177)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">II. B. Kapal Muatan Kering Umum</button>
-                            <button onclick="showChapter('II. C. Kulit dan Pintu Bagian Dalam Kapal Ro-Ro', 189)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">II. C. Kulit dan Pintu Bagian Dalam Kapal Ro-Ro</button>
-                            <button onclick="showChapter('II. D. Kapal Pengangkut Ternak', 192)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">II. D. Kapal Pengangkut Ternak</button>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <button onclick="toggleSubChapters('sub-lampiran-a', this)" class="w-full flex justify-between items-center text-left p-4 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <span class="font-bold text-lg text-gray-800">Lampiran A</span>
-                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="sub-lampiran-a" class="hidden pl-4 pt-2 space-y-1">
-                             <button onclick="showChapter('A.1 Petunjuk Masuk Ruang Tertutup', 194)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A.1 Petunjuk Masuk Ruang Tertutup</button>
-                             <button onclick="showChapter('A.2 Survei lambung untuk Konstruksi Kapal Baru', 199)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A.2 Survei lambung untuk Konstruksi Kapal Baru</button>
-                             <button onclick="showChapter('A.3 Batasan Pengurangan', 226)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A.3 Batasan Pengurangan</button>
-                             <button onclick="showChapter('A.4 Persyaratan Klas untuk Penambatan Kapal', 228)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A.4 Persyaratan Klas untuk Penambatan Kapal</button>
-                             <button onclick="showChapter('A.5 Survei Transit Kabel Kedap Air', 236)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A.5 Survei Transit Kabel Kedap Air</button>
-                             <button onclick="showChapter('A.6 Prosedur Pengujian Kompartemen Kedap Air', 238)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A.6 Prosedur Pengujian Kompartemen Kedap Air</button>
-                             <button onclick="showChapter('A.7 Definisi', 248)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A.7 Definisi</button>
-                             <button onclick="showChapter('A.8 Daftar Kontak untuk Mengubah Status Klasifikasi', 259)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">A.8 Daftar Kontak untuk Mengubah Status Klasifikasi</button>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <button onclick="toggleSubChapters('sub-lampiran-b', this)" class="w-full flex justify-between items-center text-left p-4 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <span class="font-bold text-lg text-gray-800">Lampiran B</span>
-                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="sub-lampiran-b" class="hidden pl-4 pt-2 space-y-1">
-                             <button onclick="showChapter('B.1 Laporan Inspeksi Pemilik', 260)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.1 Laporan Inspeksi Pemilik</button>
-                             <button onclick="showChapter('B.2 Contoh Program Survei', 261)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.2 Contoh Program Survei</button>
-                             <button onclick="showChapter('B.3 Kuesioner Perencanaan Survei', 265)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.3 Kuesioner Perencanaan Survei</button>
-                             <button onclick="showChapter('B.4 Penilaian teknis...', 268)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.4 Penilaian teknis...</button>
-                             <button onclick="showChapter('B.5 Persyaratan Perluasan Pengukuran...', 275)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.5 Persyaratan Perluasan Pengukuran...</button>
-                             <button onclick="showChapter('B.6 Pedoman Pengukuran Sekat Kedap Air...', 286)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.6 Pedoman Pengukuran Sekat Kedap Air...</button>
-                             <button onclick="showChapter('B.7 Pedoman Pengukuran Ketebalan...', 290)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.7 Pedoman Pengukuran Ketebalan...</button>
-                             <button onclick="showChapter('B.8 Persyaratan Survei Tahunan Tambahan...', 293)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.8 Persyaratan Survei Tahunan Tambahan...</button>
-                             <button onclick="showChapter('B.9 Kekuatan Pengaturan Pengamanan...', 294)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.9 Kekuatan Pengaturan Pengamanan...</button>
-                             <button onclick="showChapter('B.10 Kriteria Kekuatan Memanjang...', 294)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.10 Kriteria Kekuatan Memanjang...</button>
-                             <button onclick="showChapter('B.11 Kriteria Pembaruan untuk Gading...', 297)" class="w-full text-left p-3 rounded-md hover:bg-blue-50 transition-colors">B.11 Kriteria Pembaruan untuk Gading...</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+    <!-- LIST VIEW -->
+    <div id="listView" class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+      <div class="px-6 py-8 border-b border-gray-200">
+        <h1 class="text-3xl font-bold">Peraturan Klasifikasi dan Survei</h1>
+        <p class="mt-2 text-gray-600">Pilih Bab / Sub-bab untuk langsung lompat ke halaman PDF.</p>
+      </div>
+      <div class="px-6 py-8">
+        <div id="toc-list" class="space-y-4">
+          <!-- Akan diisi oleh script.js -->
         </div>
-
-        <div id="pdfView" class="hidden">
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div class="p-4 sm:p-6 flex justify-between items-center border-b border-gray-200">
-                    <h2 id="pdf-title" class="text-xl font-bold text-gray-800">Memuat Dokumen...</h2>
-                    <button onclick="showList()" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        &larr; Kembali ke Daftar
-                    </button>
-                </div>
-                <div class="p-2 bg-gray-50">
-                    <div class="pdf-frame-container shadow-lg rounded-md bg-white">
-                        <iframe 
-                            id="pdf-viewer"
-                            src=""
-                            class="pdf-frame"
-                            title="Tampilan PDF">
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- PDF VIEWER -->
+    <div id="pdfView" class="hidden">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+          <h2 id="pdf-title" class="text-xl font-bold">Memuat Dokumen...</h2>
+          <button
+            onclick="showList()"
+            class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            &larr; Kembali
+          </button>
+        </div>
+        <div class="bg-gray-50 p-4">
+          <div class="pdf-frame-container shadow-lg rounded-md bg-white">
+            <iframe
+              id="pdf-viewer"
+              src=""
+              class="pdf-frame"
+              title="Tampilan PDF"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
 
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

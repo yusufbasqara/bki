@@ -1,24 +1,23 @@
-/* Mengatur font utama dan perilaku scroll */
+/* Reset dan font */
 body {
-    font-family: 'Inter', sans-serif;
-    scroll-behavior: smooth;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
 }
 
-/* Style untuk memastikan iframe PDF responsif dan menjaga rasio aspek */
+/* PDF container: penuh layar minus header (~6rem) */
 .pdf-frame-container {
-    position: relative;
-    width: 100%;
-    padding-top: 141.42%; /* Aspect Ratio untuk PDF ukuran A4 (297/210) */
-    height: 0;
-    overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 6rem);
+  overflow: hidden;
 }
 
-/* Style untuk iframe agar mengisi penuh container-nya */
 .pdf-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
