@@ -1,4 +1,4 @@
-/* Reset + font + background */
+/* Reset, font, background */
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -6,16 +6,16 @@ body {
   scroll-behavior: smooth;
 }
 
-/* PDF container: scrollable full-height minus header/footer (~12rem) */
+/* PDF container: full-height minus header/footer (~12rem) */
 .pdfContainer {
   width: 100%;
   height: calc(100vh - 12rem);
   overflow-y: auto;
   scroll-behavior: smooth;
-  padding-right: 0.5rem; /* space for scrollbar */
+  padding-right: 0.5rem;
 }
 
-/* Style tiap halaman */
+/* Each page wrapper */
 .pdfContainer .pageDiv {
   margin-bottom: 1.5rem;
   display: flex;
