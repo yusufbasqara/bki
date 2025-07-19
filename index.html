@@ -30,7 +30,7 @@
     <div id="listView" class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
       <div class="px-6 py-8 border-b border-gray-200">
         <h1 class="text-3xl font-bold">Peraturan Klasifikasi dan Survei</h1>
-        <p class="mt-2 text-gray-600">Pilih Bab / Sub-bab agar langsung lompat ke halaman PDF.</p>
+        <p class="mt-2 text-gray-600">Pilih Bab / Sub-bab untuk lompat langsung ke halaman PDF.</p>
       </div>
       <div class="px-6 py-8">
         <div id="toc-list" class="space-y-4">
@@ -61,11 +61,11 @@
 
   </div>
 
-  <!-- PDF.js -->
+  <!-- PDF.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script>
-    // Path ke worker untuk disable download dll
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
   </script>
   <script src="script.js"></script>
 </body>
