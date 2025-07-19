@@ -1,5 +1,5 @@
 // ========= setup PDF.js =========
-const pdfBaseUrl = 'asset/publication.pdf';
+const pdfBaseUrl = 'lib/publication.pdf';
 let pdfDoc = null;
 
 // DOM references
