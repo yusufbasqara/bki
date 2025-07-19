@@ -1,6 +1,6 @@
 // ==== Setup PDF.js & DOM refs ====
-const pdfPath    = 'lib/publication.pdf';
-let   pdfDoc     = null;
+const pdfPath     = 'lib/publication.pdf';
+let   pdfDoc      = null;
 
 const listView    = document.getElementById('listView');
 const pdfView     = document.getElementById('pdfView');
@@ -54,6 +54,7 @@ function renderTOC() {
       </div>`;
   }).join('');
 
+  // deteksi ?goto= atau #babX
   const params = new URLSearchParams(window.location.search);
   if (params.has('goto')) {
     handleDeepLink(params.get('goto'));
@@ -68,7 +69,7 @@ function toggleSubChapters(babId, btn) {
   const icon   = btn.querySelector('svg');
   const opening = subDiv.classList.contains('hidden');
 
-  // Tutup semua Bab lain
+  // tutup semua Bab lain
   document.querySelectorAll('[id^="bab"]').forEach(el => {
     if (el.id !== babId) {
       el.classList.add('hidden');
@@ -105,34 +106,55 @@ function openPDF(btn) {
   }
 }
 
-/** Render semua halaman, lalu scroll ke halaman target */
+/**
+ * Render semua halaman dengan lazy‐loading via IntersectionObserver,
+ * lalu scroll ke halaman target.
+ */
 function renderAllPages(targetPage) {
   pdfContainer.innerHTML = '';
   const total = pdfDoc.numPages;
 
-  for (let i = 1; i <= total; i++) {
-    const pageDiv = document.createElement('div');
-    pageDiv.className = 'pageDiv';
-    pageDiv.dataset.page = i;
-    const canvas = document.createElement('canvas');
-    pageDiv.appendChild(canvas);
-    pdfContainer.appendChild(pageDiv);
-
-    pdfDoc.getPage(i).then(page => {
-      const vp0 = page.getViewport({ scale: 1 });
-      const scale = pdfContainer.clientWidth / vp0.width;
-      const vp = page.getViewport({ scale });
-      canvas.width  = vp.width;
-      canvas.height = vp.height;
-      page.render({ canvasContext: canvas.getContext('2d'), viewport: vp })
-          .promise.finally(() => {
-            if (i === targetPage) scrollToPage(targetPage);
-          });
+  // siapkan observer untuk lazy‐load
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const wrapper = entry.target;
+      const num = parseInt(wrapper.dataset.page, 10);
+      if (!wrapper.dataset.rendered) {
+        const canvas = wrapper.querySelector('canvas');
+        pdfDoc.getPage(num).then(page => {
+          const vp0   = page.getViewport({ scale: 1 });
+          const scale = pdfContainer.clientWidth / vp0.width;
+          const vp    = page.getViewport({ scale });
+          canvas.width  = vp.width;
+          canvas.height = vp.height;
+          page.render({ canvasContext: canvas.getContext('2d'), viewport: vp })
+              .promise.then(() => wrapper.dataset.rendered = 'true');
+        });
+      }
+      obs.unobserve(wrapper);
     });
+  }, {
+    root: pdfContainer,
+    rootMargin: '200px 0px',
+    threshold: 0.1
+  });
+
+  // buat placeholder setiap halaman
+  for (let i = 1; i <= total; i++) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pageDiv';
+    wrapper.dataset.page = i;
+    wrapper.innerHTML = '<canvas></canvas>';
+    pdfContainer.appendChild(wrapper);
+    observer.observe(wrapper);
   }
+
+  // scroll ke halaman target setelah setup
+  scrollToPage(targetPage);
 }
 
-/** Scroll ke halaman */
+/** Scroll ke halaman tertentu */
 function scrollToPage(pageNum) {
   const el = document.querySelector(`.pageDiv[data-page="${pageNum}"]`);
   if (el) pdfContainer.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
@@ -147,7 +169,7 @@ function handleDeepLink(code) {
   openPDF(btn);
 }
 
-/** Hash routing #babX */
+/** Hash routing #babX (tanpa PDF) */
 function handleHash(babId) {
   const btn = document.querySelector(`button[data-target="${babId}"]`);
   if (!btn) return;
