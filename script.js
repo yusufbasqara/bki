@@ -1,6 +1,6 @@
 // URL dasar dari file PDF yang sudah kamu upload.
-// Ganti link ini jika kamu meng-host PDF di tempat lain.
-const pdfBaseUrl = "https://drive.google.com/file/d/1vXaQxdxwXF4kR5ZuQdH5UQ7M7dK3rgKO/preview";
+// Ganti link Google Drive dengan path lokal ini
+const pdfBaseUrl = "assets/pdf/publication.pdf";
 
 // Mengambil elemen-elemen dari halaman HTML untuk dimanipulasi
 const listView = document.getElementById('listView');
