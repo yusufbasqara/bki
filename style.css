@@ -1,22 +1,22 @@
-/* Reset margin + smooth scroll + font */
+/* Reset + font + background */
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
+  background-color: #F9FAFB;
   scroll-behavior: smooth;
 }
 
-/* Container PDF full-height responsive + scroll */
+/* PDF container full-height minus header/footer (~6rem each) */
 .pdf-frame-container {
   position: relative;
   width: 100%;
-  height: calc(100vh - 6rem);
+  height: calc(100vh - 12rem);
   overflow-y: auto;
   display: flex;
   justify-content: center;
   align-items: start;
 }
 
-/* Canvas menyesuaikan lebar container */
 .pdf-frame-container canvas {
   display: block;
   max-width: 100%;
