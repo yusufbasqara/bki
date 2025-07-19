@@ -1,23 +1,24 @@
-/* Reset dan font */
+/* Reset margin + smooth scroll + font */
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
   scroll-behavior: smooth;
 }
 
-/* PDF container: penuh layar minus header (~6rem) */
+/* Container PDF full-height responsive + scroll */
 .pdf-frame-container {
   position: relative;
   width: 100%;
   height: calc(100vh - 6rem);
-  overflow: hidden;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: start;
 }
 
-.pdf-frame {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
+/* Canvas menyesuaikan lebar container */
+.pdf-frame-container canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }

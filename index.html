@@ -11,9 +11,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif']
-          }
+          fontFamily: { sans: ['Inter','sans-serif'] }
         }
       }
     }
@@ -28,15 +26,15 @@
 
   <div class="max-w-4xl mx-auto p-4 lg:p-8">
 
-    <!-- LIST VIEW -->
+    <!-- DAFTAR ISI -->
     <div id="listView" class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
       <div class="px-6 py-8 border-b border-gray-200">
         <h1 class="text-3xl font-bold">Peraturan Klasifikasi dan Survei</h1>
-        <p class="mt-2 text-gray-600">Pilih Bab / Sub-bab untuk langsung lompat ke halaman PDF.</p>
+        <p class="mt-2 text-gray-600">Pilih Bab / Sub-bab agar langsung lompat ke halaman PDF.</p>
       </div>
       <div class="px-6 py-8">
         <div id="toc-list" class="space-y-4">
-          <!-- Akan diisi oleh script.js -->
+          <!-- Dihasilkan oleh script.js -->
         </div>
       </div>
     </div>
@@ -48,19 +46,14 @@
           <h2 id="pdf-title" class="text-xl font-bold">Memuat Dokumen...</h2>
           <button
             onclick="showList()"
-            class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-nowrap"
           >
             &larr; Kembali
           </button>
         </div>
         <div class="bg-gray-50 p-4">
           <div class="pdf-frame-container shadow-lg rounded-md bg-white">
-            <iframe
-              id="pdf-viewer"
-              src=""
-              class="pdf-frame"
-              title="Tampilan PDF"
-            ></iframe>
+            <canvas id="pdf-canvas"></canvas>
           </div>
         </div>
       </div>
@@ -68,6 +61,12 @@
 
   </div>
 
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    // Path ke worker untuk disable download dll
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
