@@ -1,5 +1,5 @@
 // Path ke PDF
-const pdfBaseUrl = "asset/publication.pdf";
+const pdfBaseUrl = "lib/publication.pdf";
 
 // Struktur TOC diambil dari metadata PDF (level 2 = Bab, level 3 = Sub-bab)
 const toc = [
