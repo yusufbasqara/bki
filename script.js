@@ -2,6 +2,7 @@
 const pdfPath     = 'lib/publication.pdf';
 let   pdfDoc      = null;
 
+// DOM elements
 const listView    = document.getElementById('listView');
 const pdfView     = document.getElementById('pdfView');
 const pdfTitle    = document.getElementById('pdf-title');
@@ -73,7 +74,7 @@ const toc = [
 /** Bangun daftar isi & handle deep-link/hash */
 function renderTOC() {
   const container = document.getElementById('toc-list');
-  container.innerHTML = toc.map((chap,i) => {
+  container.innerHTML = toc.map((chap, i) => {
     const babId = `bab${i+1}`;
     return `
       <div>
@@ -109,75 +110,53 @@ function renderTOC() {
 function toggleSubChapters(babId, btn) {
   const sub = document.getElementById(babId);
   const icon = btn.querySelector('svg');
-  const open = sub.classList.contains('hidden');
+  const opening = sub.classList.contains('hidden');
   document.querySelectorAll('[id^="bab"]').forEach(el => {
     if (el.id !== babId) {
       el.classList.add('hidden');
       document.querySelector(`button[data-target="${el.id}"] svg`).classList.remove('rotate-180');
     }
   });
-  if (open) {
-    sub.classList.remove('hidden'); icon.classList.add('rotate-180'); history.replaceState(null,'',`#${babId}`);
+  if (opening) {
+    sub.classList.remove('hidden'); icon.classList.add('rotate-180'); history.replaceState(null, '', `#${babId}`);
   } else {
-    sub.classList.add('hidden'); icon.classList.remove('rotate-180'); history.replaceState(null,'',window.location.pathname);
+    sub.classList.add('hidden'); icon.classList.remove('rotate-180'); history.replaceState(null, '', window.location.pathname);
   }
 }
 
 /** Buka PDF.js full-viewer */
 function openPDF(btn) {
   const title = btn.textContent.trim();
-  const page = parseInt(btn.dataset.page,10);
+  const page  = +btn.dataset.page;
   pdfTitle.textContent = title;
-  listView.classList.add('hidden'); pdfView.classList.remove('hidden');
+  listView.classList.add('hidden');
+  pdfView.classList.remove('hidden');
+
   if (!pdfDoc) {
-    pdfjsLib.getDocument(pdfPath).promise.then(doc => { pdfDoc = doc; renderAllPages(page); });
-  } else scrollToPage(page);
+    pdfjsLib.getDocument(pdfPath).promise.then(doc => {
+      pdfDoc = doc;
+      renderAllPages(page);
+    });
+  } else {
+    scrollToPage(page);
+  }
 }
 
-/** Lazy-load render + scroll target */
+/** Render all pages lazily + scroll to target */
 function renderAllPages(targetPage) {
   pdfContainer.innerHTML = '';
   const total = pdfDoc.numPages;
-  const obs = new IntersectionObserver((ents, o) => {
-    ents.forEach(e => {
-      if (!e.isIntersecting) return;
-      const wr = e.target;
-      const p = +wr.dataset.page;
-      if (!wr.dataset.r) {
-        const c = wr.querySelector('canvas');
-        pdfDoc.getPage(p).then(pg => {
-          const v0 = pg.getViewport({scale:1});
-          const sc = pdfContainer.clientWidth / v0.width;
-          const vp = pg.getViewport({scale:sc});
-          c.width = vp.width; c.height = vp.height;
-          pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise.then(()=>wr.dataset.r='1');
-        });
-      }
-      o.unobserve(wr);
-    });
-  },{root:pdfContainer,rootMargin:'200px 0',threshold:0.1});
-  for (let i=1; i<=total; i++) {
-    const dv = document.createElement('div'); dv.className='pageDiv'; dv.dataset.page=i;
-    dv.innerHTML='<canvas></canvas>'; pdfContainer.appendChild(dv); obs.observe(dv);
-  }
-  scrollToPage(targetPage);
-}
-
-/** Scroll to page */
-function scrollToPage(n) {
-  const el = document.querySelector(`.pageDiv[data-page="${n}"]`);
-  if (el) pdfContainer.scrollTo({top:el.offsetTop,behavior:'smooth'});
-}
-
-/** Deep-link ?goto= */
-function handleDeepLink(code) { const b=document.querySelector(`button[data-goto="${code}"]`); if(!b)return; const pid=b.closest('div[id^="bab"]').id; toggleSubChapters(pid,document.querySelector(`button[data-target="${pid}"]`)); openPDF(b); }
-
-/** Hash #babX */
-function handleHash(id) { const b=document.querySelector(`button[data-target="${id}"]`); if(!b)return; document.getElementById(id).classList.remove('hidden'); b.querySelector('svg').classList.add('rotate-180'); }
-
-/** Kembali */
-function showList(){ pdfView.classList.add('hidden'); listView.classList.remove('hidden'); window.scrollTo({top:0,behavior:'smooth'}); }
-
-// Inisiasi
-if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderTOC);
-else renderTOC();
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const div = entry.target;
+      const num = +div.dataset.page;
+      if (!div.dataset.rendered) {
+        const canvas = div.querySelector('canvas');
+        pdfDoc.getPage(num).then(page => {
+          const vp0 = page.getViewport({ scale: 1 });
+          const scale = pdfContainer.clientWidth / vp0.width;
+          const vp = page.getViewport({ scale });
+          canvas.width = vp.width;
+          canvas.height = vp.height;
+          page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise.then(() => {
