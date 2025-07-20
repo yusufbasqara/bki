@@ -1,14 +1,14 @@
 // ==== Setup PDF.js & DOM refs ====
-const pdfPath     = 'lib/publication.pdf';
-let   pdfDoc      = null;
+const pdfPath      = 'lib/publication.pdf';
+let   pdfDoc       = null;
 
-// DOM elements
-const listView    = document.getElementById('listView');
-const pdfView     = document.getElementById('pdfView');
-const pdfTitle    = document.getElementById('pdf-title');
-const pdfContainer= document.getElementById('pdfContainer');
+const listView     = document.getElementById('listView');
+const pdfView      = document.getElementById('pdfView');
+const pdfTitle     = document.getElementById('pdf-title');
+const pdfContainer = document.getElementById('pdfContainer');
+const fullScreenBtn= document.getElementById('fullScreenBtn');
 
-// Daftar isi lengkap dengan sub-bab
+// Daftar isi lengkap dengan sub-bab (sesuaikan data ini dengan yang sudah ada)
 const toc = [
   {
     title: "Bab 1: Syarat dan Ketentuan Umum",
@@ -55,31 +55,27 @@ const toc = [
       { title: "A.2 Survei Lambung Kapal Baru", page: 199 },
       { title: "A.3 Batasan Pengurangan", page: 226 },
       { title: "A.4 Persyaratan Klas untuk Penambatan Kapal", page: 229 },
-      { title: "A.5 Survei Transit Kabel Kedap Air", page: 234 },
-      { title: "B. Persyaratan Tambahan Notasi…", page: 240 },
-      { title: "C. Survei Gas dan Bahan Bakar", page: 250 },
-      { title: "D. Survei…", page: 260 },
-      { title: "E.…", page: 270 },
-      { title: "F.…", page: 280 },
-      { title: "G.…", page: 286 },
-      { title: "H.…", page: 290 },
-      { title: "B.8 Persyaratan Survei Tahunan…", page: 293 },
-      { title: "B.9 Kekuatan Pengamanan Penutup Palka", page: 294 },
-      { title: "B.10 Kekuatan Memanjang Penumpu Lambung", page: 294 },
-      { title: "B.11 Kriteria Pembaruan untuk Gading…", page: 297 }
+      { title: "A.5 Survei Transit Kabel Kedap Air", page: 234 }
     ]
   }
 ];
 
-/** Bangun daftar isi & handle deep-link/hash */
+document.addEventListener('DOMContentLoaded', () => {
+  renderTOC();
+  fullScreenBtn.addEventListener('click', toggleFullScreen);
+});
+
+/** Bangun TOC + deep-link & hash */
 function renderTOC() {
   const container = document.getElementById('toc-list');
-  container.innerHTML = toc.map((chap, i) => {
+  container.innerHTML = toc.map((chap,i) => {
     const babId = `bab${i+1}`;
     return `
       <div>
-        <button data-target="${babId}" onclick="toggleSubChapters('${babId}', this)"
-          class="w-full flex justify-between items-center bg-gray-100 hover:bg-gray-200 px-4 py-3 rounded-lg border transition focus:ring-2 focus:ring-blue-500">
+        <button data-target="${babId}"
+          onclick="toggleSubChapters('${babId}', this)"
+          class="w-full flex justify-between items-center bg-gray-100 hover:bg-gray-200 px-4 py-3 rounded-lg border transition focus:ring-2 focus:ring-blue-500"
+        >
           <span class="font-semibold text-left">${chap.title}</span>
           <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -87,9 +83,11 @@ function renderTOC() {
         </button>
         <div id="${babId}" class="hidden pl-6 mt-2 space-y-1">
           ${chap.sub.map(sub => `
-            <button data-goto="${i+1}${sub.title.split(' ')[0].replace(/\D/g,'')}" data-page="${sub.page}"
+            <button data-goto="${i+1}${sub.title[0]}"
+              data-page="${sub.page}"
               onclick="openPDF(this)"
-              class="flex items-center w-full text-left py-2 px-3 rounded hover:bg-blue-50 transition whitespace-nowrap">
+              class="flex items-center w-full text-left py-2 px-3 rounded hover:bg-blue-50 transition whitespace-nowrap"
+            >
               <svg class="w-3 h-3 mr-2 text-blue-600" viewBox="0 0 8 8" fill="currentColor">
                 <circle cx="4" cy="4" r="4"/>
               </svg>
@@ -97,19 +95,17 @@ function renderTOC() {
             </button>
           `).join('')}
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 
   const params = new URLSearchParams(window.location.search);
   if (params.has('goto')) handleDeepLink(params.get('goto'));
-  else if (window.location.hash) handleHash(window.location.hash.slice(1));
+  else if (window.location.hash) handleHash(location.hash.slice(1));
 }
 
-/** Accordion toggle */
+/** Toggle Accordion */
 function toggleSubChapters(babId, btn) {
-  const sub = document.getElementById(babId);
-  const icon = btn.querySelector('svg');
+  const sub = document.getElementById(babId), icon = btn.querySelector('svg');
   const open = sub.classList.contains('hidden');
   document.querySelectorAll('[id^="bab"]').forEach(el => {
     if (el.id !== babId) {
@@ -117,71 +113,118 @@ function toggleSubChapters(babId, btn) {
       document.querySelector(`button[data-target="${el.id}"] svg`).classList.remove('rotate-180');
     }
   });
-  if (open) { sub.classList.remove('hidden'); icon.classList.add('rotate-180'); history.replaceState(null, '', `#${babId}`); }
-  else      { sub.classList.add('hidden'); icon.classList.remove('rotate-180'); history.replaceState(null, '', window.location.pathname); }
+  if (open) {
+    sub.classList.remove('hidden');
+    icon.classList.add('rotate-180');
+    history.replaceState(null,'',`#${babId}`);
+  } else {
+    sub.classList.add('hidden');
+    icon.classList.remove('rotate-180');
+    history.replaceState(null,'',window.location.pathname);
+  }
 }
 
 /** Buka PDF.js full-viewer */
 function openPDF(btn) {
-  const title = btn.textContent.trim();
-  const page  = parseInt(btn.dataset.page, 10);
-  pdfTitle.textContent = title;
   listView.classList.add('hidden');
   pdfView.classList.remove('hidden');
+  pdfTitle.textContent = btn.textContent.trim();
+  const pageNum = +btn.dataset.page;
   if (!pdfDoc) {
-    pdfjsLib.getDocument(pdfPath).promise.then(doc => { pdfDoc = doc; renderAllPages(page); });
+    pdfjsLib.getDocument(pdfPath).promise.then(doc => {
+      pdfDoc = doc;
+      renderAllPages(pageNum);
+    });
   } else {
-    scrollToPage(page);
+    scrollToPage(pageNum);
   }
 }
 
-/** Render all pages lazily + scroll target */
+/** Lazy-load + High-DPI render */
 function renderAllPages(targetPage) {
-  pdfContainer.innerHTML = ''; const total = pdfDoc.numPages;
+  pdfContainer.innerHTML = '';
+  const total = pdfDoc.numPages;
+  const pixelRatio = window.devicePixelRatio || 1;
+
   const observer = new IntersectionObserver((entries, obs) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      const div = entry.target; const num = +div.dataset.page;
+      const div = entry.target;
+      const num = +div.dataset.page;
       if (!div.dataset.rendered) {
-        const canvas = div.querySelector('canvas');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        div.appendChild(canvas);
         pdfDoc.getPage(num).then(page => {
           const vp0 = page.getViewport({ scale: 1 });
-          const scale = pdfContainer.clientWidth / vp0.width;
-          const vp    = page.getViewport({ scale });
-          canvas.width  = vp.width; canvas.height = vp.height;
-          page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise.then(() => div.dataset.rendered = '1');
+          const cssScale = pdfContainer.clientWidth / vp0.width;
+          const actualScale = cssScale * pixelRatio;
+          const vp = page.getViewport({ scale: actualScale });
+
+          canvas.width = vp.width;
+          canvas.height = vp.height;
+          canvas.style.width = `${vp.width / pixelRatio}px`;
+          canvas.style.height = `${vp.height / pixelRatio}px`;
+
+          page.render({ canvasContext: ctx, viewport: vp })
+              .promise.then(() => { div.dataset.rendered = 'true'; });
         });
       }
       obs.unobserve(div);
     });
-  }, { root: pdfContainer, rootMargin: '200px 0px', threshold: 0.1 });
+  }, { root: pdfContainer, rootMargin: '200px', threshold: 0.1 });
 
+  // Create placeholders and observe
   for (let i = 1; i <= total; i++) {
     const wrapper = document.createElement('div');
-    wrapper.className = 'pageDiv'; wrapper.dataset.page = i;
-    wrapper.innerHTML = '<canvas></canvas>';
+    wrapper.className = 'pageDiv';
+    wrapper.dataset.page = i;
     pdfContainer.appendChild(wrapper);
     observer.observe(wrapper);
   }
-  // scroll setelah render containers
+
   scrollToPage(targetPage);
 }
 
-/** Scroll ke halaman */
-function scrollToPage(n) { const el = document.querySelector(`.pageDiv[data-page="${n}"]`); if (el) pdfContainer.scrollTo({ top: el.offsetTop, behavior: 'smooth' }); }
+/** Scroll to specific page */
+function scrollToPage(n) {
+  const el = document.querySelector(`.pageDiv[data-page="${n}"]`);
+  if (el) pdfContainer.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+}
+
+/** Fullscreen toggle */
+function toggleFullScreen() {
+  const mainEl = document.querySelector('main');
+  if (!document.fullscreenElement) {
+    mainEl.requestFullscreen();
+    pdfView.classList.add('fullscreen');
+  } else {
+    document.exitFullscreen();
+    pdfView.classList.remove('fullscreen');
+  }
+}
 
 /** Deep-link via ?goto= */
-function handleDeepLink(code) { const btn = document.querySelector(`button[data-goto="${code}"]`); if (!btn) return; const pid = btn.closest('div[id^="bab"]').id; toggleSubChapters(pid, document.querySelector(`button[data-target="${pid}"]`)); openPDF(btn); }
+function handleDeepLink(code) {
+  const btn = document.querySelector(`button[data-goto="${code}"]`);
+  if (!btn) return;
+  const pid = btn.closest('div[id^="bab"]').id;
+  toggleSubChapters(pid, document.querySelector(`button[data-target="${pid}"]`));
+  openPDF(btn);
+}
 
 /** Hash routing #babX */
-function handleHash(id) { const btn = document.querySelector(`button[data-target="${id}"]`); if (!btn) return; document.getElementById(id).classList.remove('hidden'); btn.querySelector('svg').classList.add('rotate-180'); }
+function handleHash(id) {
+  const btn = document.querySelector(`button[data-target="${id}"]`);
+  if (!btn) return;
+  const subDiv = document.getElementById(id);
+  subDiv.classList.remove('hidden');
+  btn.querySelector('svg').classList.add('rotate-180');
+}
 
-/** Kembali */
-function showList() { pdfView.classList.add('hidden'); listView.classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-// Inisiasi
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', renderTOC);
-} else {
-  renderTOC();
+/** Kembali ke daftar isi */
+function showList() {
+  pdfView.classList.add('hidden');
+  listView.classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
